@@ -11,6 +11,10 @@ import torch as th
 import torch.distributed as dist
 import torch.nn.functional as F
 
+import sys
+sys.path.append(os.getcwd())
+
+
 from guided_diffusion import dist_util, logger
 from guided_diffusion.script_util import (
     NUM_CLASSES,
