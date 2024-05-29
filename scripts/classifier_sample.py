@@ -27,7 +27,7 @@ def main():
     args = create_argparser().parse_args()
 
     dist_util.setup_dist()
-    logger.configure()
+    logger.configure(dir=args.classifier_path)
 
     logger.log("creating model and diffusion...")
     model, diffusion = create_model_and_diffusion(
@@ -119,6 +119,7 @@ def create_argparser():
         model_path="",
         classifier_path="",
         classifier_scale=1.0,
+        save_dir='/tmp'
     )
     defaults.update(model_and_diffusion_defaults())
     defaults.update(classifier_defaults())
