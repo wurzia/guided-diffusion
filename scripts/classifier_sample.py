@@ -12,7 +12,7 @@ import torch.distributed as dist
 import torch.nn.functional as F
 
 import sys
-sys.path.append(os.getcwd())
+sys.path.append("./guided-diffusion")
 
 
 from guided_diffusion import dist_util, logger
