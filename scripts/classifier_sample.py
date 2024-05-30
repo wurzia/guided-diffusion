@@ -90,9 +90,9 @@ def main():
                 device=dist_util.dev(),
             ):
                 if final != None:
-                    final = np.concatenate(final, sample["sample"], axis=3)
+                    final = np.concatenate(final, sample_t["sample"], axis=3)
                 else:
-                    final = sample["sample"]
+                    final = sample_t["sample"]
             sample = final
 
         else:
