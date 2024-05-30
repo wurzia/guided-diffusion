@@ -89,7 +89,7 @@ def main():
                 cond_fn=cond_fn,
                 device=dist_util.dev(),
             ):
-                if final != None
+                if final != None:
                     final = np.concatenate(final, sample["sample"], axis=3)
                 else:
                     final = sample["sample"]
