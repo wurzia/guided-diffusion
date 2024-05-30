@@ -140,7 +140,7 @@ def create_argparser():
         classifier_path="",
         classifier_scale=1.0,
         save_dir='/tmp',
-        progressive=false
+        progressive=False
     )
     defaults.update(model_and_diffusion_defaults())
     defaults.update(classifier_defaults())
