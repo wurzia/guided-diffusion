@@ -484,6 +484,38 @@ class GaussianDiffusion:
             final = sample
         return final["sample"]
 
+    def p_sample_loop_progressive_all(
+        self,
+        model,
+        shape,
+        noise=None,
+        clip_denoised=True,
+        denoised_fn=None,
+        cond_fn=None,
+        model_kwargs=None,
+        device=None,
+        progress=False,
+    ):
+        """
+        Generate samples from the model, collating intermediate samples from
+        each timestep of diffusion along the width dimension.
+
+        Arguments are the same as p_sample_loop().
+        Returns a a non-differentiable batch of samples
+        """
+        samples = [sample_t["sample"] for sample_t in p_sample_loop_progressive(
+            model,
+            shape,
+            noise=noise,
+            clip_denoised=clip_denoised,
+            denoised_fn=denoised_fn,
+            cond_fn=cond_fn,
+            model_kwargs=model_kwargs,
+            device=device,
+            progress=progress,
+        )]
+        return th.cat(samples, dim=3)
+
     def p_sample_loop_progressive(
         self,
         model,

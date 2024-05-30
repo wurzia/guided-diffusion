@@ -78,35 +78,19 @@ def main():
         )
         model_kwargs["y"] = classes
 
-        sample = None
-        if args.progressive:
-            final = None
-            for sample_t in diffusion.p_sample_loop_progressive(
-                model_fn,
-                (args.batch_size, 3, args.image_size, args.image_size),
-                clip_denoised=args.clip_denoised,
-                model_kwargs=model_kwargs,
-                cond_fn=cond_fn,
-                device=dist_util.dev(),
-            ):
-                if final==None:
-                    final = sample_t["sample"]
-                else:
-                    final = th.cat((final, sample_t["sample"]), dim=3)
-                sample = final
 
-        else:
-            sample_fn = (
+        sample_fn = (
+            diffusion.p_sample_loop_progressive if args.progressive else
                 diffusion.p_sample_loop if not args.use_ddim else diffusion.ddim_sample_loop
-            )
-            sample = sample_fn(
-                model_fn,
-                (args.batch_size, 3, args.image_size, args.image_size),
-                clip_denoised=args.clip_denoised,
-                model_kwargs=model_kwargs,
-                cond_fn=cond_fn,
-                device=dist_util.dev(),
-            )
+        )
+        sample = sample_fn(
+            model_fn,
+            (args.batch_size, 3, args.image_size, args.image_size),
+            clip_denoised=args.clip_denoised,
+            model_kwargs=model_kwargs,
+            cond_fn=cond_fn,
+            device=dist_util.dev(),
+        )
         sample = ((sample + 1) * 127.5).clamp(0, 255).to(th.uint8)
         sample = sample.permute(0, 2, 3, 1)
         sample = sample.contiguous()
