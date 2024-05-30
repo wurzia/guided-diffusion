@@ -503,7 +503,7 @@ class GaussianDiffusion:
         Arguments are the same as p_sample_loop().
         Returns a a non-differentiable batch of samples
         """
-        samples = [sample_t["sample"] for sample_t in p_sample_loop_progressive(
+        samples = [sample_t["sample"] for sample_t in self.p_sample_loop_progressive(
             model,
             shape,
             noise=noise,
