@@ -89,11 +89,11 @@ def main():
                 cond_fn=cond_fn,
                 device=dist_util.dev(),
             ):
-                if final != None:
-                    final = np.concatenate((final, sample_t["sample"]), axis=3)
-                else:
+                if final==None:
                     final = sample_t["sample"]
-            sample = final
+                else:
+                    final = th.cat((final, sample_t["sample"]), dim=3)
+                sample = final
 
         else:
             sample_fn = (
