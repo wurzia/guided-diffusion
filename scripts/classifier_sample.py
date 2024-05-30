@@ -77,17 +77,33 @@ def main():
             low=0, high=NUM_CLASSES, size=(args.batch_size,), device=dist_util.dev()
         )
         model_kwargs["y"] = classes
-        sample_fn = (
-            diffusion.p_sample_loop if not args.use_ddim else diffusion.ddim_sample_loop
-        )
-        sample = sample_fn(
-            model_fn,
-            (args.batch_size, 3, args.image_size, args.image_size),
-            clip_denoised=args.clip_denoised,
-            model_kwargs=model_kwargs,
-            cond_fn=cond_fn,
-            device=dist_util.dev(),
-        )
+
+        sample = None
+        if args.progressive:
+            final = None
+            for sample_t in diffusion.p_sample_loop_progressive(
+                model_fn,
+                (args.batch_size, 3, args.image_size, args.image_size),
+                clip_denoised=args.clip_denoised,
+                model_kwargs=model_kwargs,
+                cond_fn=cond_fn,
+                device=dist_util.dev(),
+            ):
+                final = np.concatenate(final, sammpe["sample"], axis=2)
+            sample = final
+
+        else:
+            sample_fn = (
+                diffusion.p_sample_loop if not args.use_ddim else diffusion.ddim_sample_loop
+            )
+            sample = sample_fn(
+                model_fn,
+                (args.batch_size, 3, args.image_size, args.image_size),
+                clip_denoised=args.clip_denoised,
+                model_kwargs=model_kwargs,
+                cond_fn=cond_fn,
+                device=dist_util.dev(),
+            )
         sample = ((sample + 1) * 127.5).clamp(0, 255).to(th.uint8)
         sample = sample.permute(0, 2, 3, 1)
         sample = sample.contiguous()
@@ -123,7 +139,8 @@ def create_argparser():
         model_path="",
         classifier_path="",
         classifier_scale=1.0,
-        save_dir='/tmp'
+        save_dir='/tmp',
+        progressive=false
     )
     defaults.update(model_and_diffusion_defaults())
     defaults.update(classifier_defaults())
